@@ -2,7 +2,7 @@ import requests
 import re
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-
+from .llm_base import Chat
 def system_prompt_view(request):
     json_url = "https://crazytweaks.online/api/aichatnew/example.json"
     response = requests.get(json_url)
@@ -35,6 +35,12 @@ def system_prompt_view(request):
                 return match.group(0)
         return re.sub(placeholder_pattern, replace_match, template)
 
-    output = replace_placeholders(template, chat_data)
-    return HttpResponse(output)
+    sys_propmpt = replace_placeholders(template, chat_data)
+    current_message = chat_data["current_message_text"]
+    ai_message = Chat(system_prompt=sys_propmpt,
+                         message=current_message).query()
+    separator_line = "-" * 100 + '>'
+
+    combined_string = f"{sys_propmpt}\n{separator_line}\n{ai_message}"    
+    return HttpResponse(combined_string)
 
