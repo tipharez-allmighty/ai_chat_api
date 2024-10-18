@@ -1,6 +1,6 @@
 import requests
 
-ENDPOINT_URL = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+ENDPOINT_URL = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
 HUGGINGFACEHUB_API_TOKEN = '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'
 
 class Chat:
