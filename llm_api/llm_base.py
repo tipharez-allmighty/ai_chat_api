@@ -1,32 +1,31 @@
 import requests
 
-ENDPOINT_URL = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
-HUGGINGFACEHUB_API_TOKEN = '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'
+import requests
 
 class Chat:
-    headers = {
-        "Accept": "application/json",
-        "Authorization": f"Bearer {HUGGINGFACEHUB_API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
-    def __init__(self, system_prompt, message):
+    def __init__(self, system_prompt, endpoint_url, api_token, message):
         self.system_prompt = system_prompt
         self.message = message
-        
+        self.endpoint_url = endpoint_url
+        self.api_token = api_token
+
+        self.headers = {
+            "Accept": "application/json",
+            "Authorization": f"Bearer {self.api_token}",
+            "Content-Type": "application/json"
+        }
+
     def query(self):
         payload = {
             "model": "tgi",
             "messages": [
-                {"role": "system", "content": (
-                    f"{self.system_prompt}"
-                )},
-                {"role": "user", "content": f"{self.message}"}
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": self.message}
             ],
             "max_new_tokens": 150
         }
         try:
-            response = requests.post(ENDPOINT_URL, headers=Chat.headers, json=payload)
+            response = requests.post(self.endpoint_url, headers=self.headers, json=payload)
 
             if response.status_code == 200:
                 response_json = response.json()

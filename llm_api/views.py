@@ -16,6 +16,8 @@ def system_prompt_view(request):
     template_url = "https://crazytweaks.online/api/aichatnew/sys_template.txt"
     response = requests.get(template_url)
     template = response.text.strip()
+    
+    switch = requests.get("https://crazytweaks.online/api/aichatnew/endpoint.json").json()
 
     # Function to format chat history
     def format_chat_history(chat_history):
@@ -57,9 +59,23 @@ def system_prompt_view(request):
 
     sys_propmpt = replace_placeholders(template, chat_data)
     current_message = chat_data["current_message_text"]
-    ai_message = Chat(system_prompt=sys_propmpt,
-                         message=current_message).query()
-    separator_line = "-" * 100 + '>'
+    
+    ENDPOINT_URL_GOOD = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+    ENDPOINT_URL_BAD = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+    HUGGINGFACEHUB_API_TOKEN = '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'
+    
+    if switch['endpoint'] == "ohuenno":    
+        ai_message = Chat(system_prompt=sys_propmpt,
+                        message=current_message,
+                        endpoint_url=ENDPOINT_URL_GOOD,
+                        api_token=HUGGINGFACEHUB_API_TOKEN).query()
+    else:
+        ai_message = Chat(system_prompt=sys_propmpt,
+                        message=current_message,
+                        endpoint_url=ENDPOINT_URL_BAD,
+                        api_token=HUGGINGFACEHUB_API_TOKEN).query()        
+    
+    separator_line = f"{switch['endpoint']}-" * 100 + '>'
 
     combined_string = f"{sys_propmpt}\n{separator_line}\n{ai_message}"    
     return HttpResponse(combined_string)
@@ -71,6 +87,7 @@ class ChatAPIView(APIView):
         template_url = "https://crazytweaks.online/api/aichatnew/sys_template.txt"
         response = requests.get(template_url)
         template = response.text.strip()
+        switch = requests.get("https://crazytweaks.online/api/aichatnew/endpoint.json").json()
         
         api_key = chat_data['api_key']
         
@@ -108,8 +125,23 @@ class ChatAPIView(APIView):
         sys_propmpt = replace_placeholders(template, chat_data)
         current_message = chat_data["current_message_text"]
         chat_id = chat_data["chat_history"]["chat_id"]
-        ai_message = Chat(system_prompt=sys_propmpt,
-                            message=current_message).query()
+        
+        
+        
+        ENDPOINT_URL_GOOD = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+        ENDPOINT_URL_BAD = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+        HUGGINGFACEHUB_API_TOKEN = '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'
+        
+        if switch['endpoint'] == "ohuenno":    
+            ai_message = Chat(system_prompt=sys_propmpt,
+                            message=current_message,
+                            endpoint_url=ENDPOINT_URL_GOOD,
+                            api_token=HUGGINGFACEHUB_API_TOKEN).query()
+        else:
+            ai_message = Chat(system_prompt=sys_propmpt,
+                            message=current_message,
+                            endpoint_url=ENDPOINT_URL_BAD,
+                            api_token=HUGGINGFACEHUB_API_TOKEN).query()    
         
         message_json = {
             'api_key': api_key,
