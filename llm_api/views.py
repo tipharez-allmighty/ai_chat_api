@@ -17,27 +17,42 @@ def system_prompt_view(request):
     response = requests.get(template_url)
     template = response.text.strip()
 
+    # Function to format chat history
     def format_chat_history(chat_history):
         formatted_messages = []
         for message in chat_history['messages']:
-            formatted_message = f"{message['created_at']}, {message['sender']}, {message['content']}"
+            # Ensure all relevant fields are included in the message
+            formatted_message = (
+                f"{message.get('created_at', 'N/A')}, "
+                f"{message.get('sender', 'N/A')}, "
+                f"{message.get('content', 'N/A')}"
+            )
             formatted_messages.append(formatted_message)
         return "\n".join(formatted_messages)
 
+    # Find and replace all placeholders in the template
     def replace_placeholders(template, chat_data):
-        placeholder_pattern = r'\{(chat_data.*?)\}'
+        placeholder_pattern = r'\{(chat_data.*?)\}'  # Regex to match placeholders starting with chat_data
 
         def replace_match(match):
-            structure = match.group(1)
+            structure = match.group(1)  # Get the placeholder structure
             
+            # Check for chat_history placeholder
             if structure == "chat_data['chat_history']":
-                return format_chat_history(chat_data['chat_history'])
+                return format_chat_history(chat_data['chat_history'])  # Return formatted chat history
+            
+            # Check for current_message_text placeholder
+            if structure == "chat_data['current_message_text']":
+                return str(chat_data['current_message_text'])  # Return current message text
 
             try:
-                value = eval(structure, {"chat_data": chat_data})
-                return str(value) 
+                # Safely access nested JSON data without losing nodes
+                value = eval(structure, {"chat_data": chat_data})  # Use eval to get the value from the JSON
+                return str(value)  # Return the string representation of the value
             except (KeyError, TypeError, NameError):
-                return match.group(0)
+                return match.group(0)  # Return the original placeholder if not found or if there's an error
+
+        # Replace all matches in the template
         return re.sub(placeholder_pattern, replace_match, template)
 
     sys_propmpt = replace_placeholders(template, chat_data)
