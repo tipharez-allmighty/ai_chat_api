@@ -69,15 +69,27 @@ def system_prompt_view(request):
                         message=current_message,
                         endpoint_url=ENDPOINT_URL_GOOD,
                         api_token=HUGGINGFACEHUB_API_TOKEN).query()
+        
+        assistant_response = ai_message['choices'][0]['message']['content']
+        prompt_tokens = ai_message['usage']['prompt_tokens']
+        completion_tokens = ai_message['usage']['completion_tokens']
+        total_tokens = ai_message['usage']['total_tokens']
     else:
         ai_message = Chat(system_prompt=sys_propmpt,
                         message=current_message,
                         endpoint_url=ENDPOINT_URL_BAD,
-                        api_token=HUGGINGFACEHUB_API_TOKEN).query()        
+                        api_token=HUGGINGFACEHUB_API_TOKEN).query()
+
+        assistant_response = ai_message['choices'][0]['message']['content']
+        prompt_tokens = ai_message['usage']['prompt_tokens']
+        completion_tokens = ai_message['usage']['completion_tokens']
+        total_tokens = ai_message['usage']['total_tokens']
+
+       
     
     separator_line = f"{switch['endpoint']}-" * 100 + '>'
 
-    combined_string = f"{sys_propmpt}\n{separator_line}\n{ai_message}"    
+    combined_string = f"{sys_propmpt}\n{separator_line}\nAI_Response: {assistant_response}\n{separator_line}\nPrompt_tokens: {prompt_tokens}\nCompletition tokens: {completion_tokens}\nTotal tokens: {total_tokens}"    
     return HttpResponse(combined_string)
 
         
@@ -137,11 +149,15 @@ class ChatAPIView(APIView):
                             message=current_message,
                             endpoint_url=ENDPOINT_URL_GOOD,
                             api_token=HUGGINGFACEHUB_API_TOKEN).query()
+            
+            ai_message = ai_message['choices'][0]['message']['content']
         else:
             ai_message = Chat(system_prompt=sys_propmpt,
                             message=current_message,
                             endpoint_url=ENDPOINT_URL_BAD,
-                            api_token=HUGGINGFACEHUB_API_TOKEN).query()    
+                            api_token=HUGGINGFACEHUB_API_TOKEN).query()
+            
+            ai_message = ai_message['choices'][0]['message']['content']    
         
         message_json = {
             'api_key': api_key,

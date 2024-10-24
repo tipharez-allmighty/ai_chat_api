@@ -27,8 +27,7 @@ class Chat:
 
             if response.status_code == 200:
                 response_json = response.json()
-                assistant_response = response_json['choices'][0]['message']['content']
-                return assistant_response 
+                return response_json 
             else:
                 print(f"Error: {response.status_code}, {response.text}")
                 return None
