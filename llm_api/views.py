@@ -60,7 +60,7 @@ def system_prompt_view(request):
     sys_propmpt = replace_placeholders(template, chat_data)
     current_message = chat_data["current_message_text"]
     
-    ENDPOINT_URL_GOOD = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+    ENDPOINT_URL_GOOD = 'https://ajouebfzyws0s5bt.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
     ENDPOINT_URL_BAD = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
     HUGGINGFACEHUB_API_TOKEN = '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'
     
