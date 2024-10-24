@@ -1,7 +1,7 @@
 import requests
 import re
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -128,7 +128,7 @@ class ChatAPIView(APIView):
         
         
         
-        ENDPOINT_URL_GOOD = 'https://pogsaya4vppaesjc.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+        ENDPOINT_URL_GOOD = 'https://ajouebfzyws0s5bt.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
         ENDPOINT_URL_BAD = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
         HUGGINGFACEHUB_API_TOKEN = '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'
         

@@ -1,7 +1,5 @@
 import requests
 
-import requests
-
 class Chat:
     def __init__(self, system_prompt, endpoint_url, api_token, message):
         self.system_prompt = system_prompt
