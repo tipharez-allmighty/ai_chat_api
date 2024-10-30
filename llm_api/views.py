@@ -1,5 +1,7 @@
 import requests
 import re
+import time
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import status
@@ -167,4 +169,81 @@ class ChatAPIView(APIView):
             }
         }
         
+        return Response({"received_data": message_json}, status=status.HTTP_200_OK)
+    
+
+class ChatAPIViewTest(APIView):
+    def post(self, request):
+        chat_data = request.data
+        template_url = "https://crazytweaks.online/api/aichatnew/sys_template.txt"
+        response = requests.get(template_url)
+        template = response.text.strip()
+        switch = requests.get("https://crazytweaks.online/api/aichatnew/endpoint.json").json()
+        
+        api_key = chat_data['api_key']
+        
+        if api_key != '3Gg8b6H2fQ9m1JzT':
+            return Response({
+                "received_data": {
+                    'api_key': api_key,
+                    'model_response': 'API key is not valid.'
+                }
+            }, status=status.HTTP_401_UNAUTHORIZED)  
+        
+        def format_chat_history(chat_history):
+            formatted_messages = []
+            for message in chat_history['messages']:
+                formatted_message = f"{message['created_at']}, {message['sender']}, {message['content']}"
+                formatted_messages.append(formatted_message)
+            return "\n".join(formatted_messages)
+
+        def replace_placeholders(template, chat_data):
+            placeholder_pattern = r'\{(chat_data.*?)\}'
+
+            def replace_match(match):
+                structure = match.group(1)
+                
+                if structure == "chat_data['chat_history']":
+                    return format_chat_history(chat_data['chat_history'])
+
+                try:
+                    value = eval(structure, {"chat_data": chat_data})
+                    return str(value) 
+                except (KeyError, TypeError, NameError):
+                    return match.group(0)
+            return re.sub(placeholder_pattern, replace_match, template)
+
+        sys_propmpt = replace_placeholders(template, chat_data)
+        current_message = chat_data["current_message_text"]
+        chat_id = chat_data["chat_history"]["chat_id"]
+        
+        
+        
+        ENDPOINT_URL_GOOD = 'https://ajouebfzyws0s5bt.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+        ENDPOINT_URL_BAD = 'https://n4mfh6a4olu13mvg.us-east-1.aws.endpoints.huggingface.cloud/v1/chat/completions'
+        HUGGINGFACEHUB_API_TOKEN = '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'
+        
+        if switch['endpoint'] == "ohuenno":    
+            ai_message = Chat(system_prompt=sys_propmpt,
+                            message=current_message,
+                            endpoint_url=ENDPOINT_URL_GOOD,
+                            api_token=HUGGINGFACEHUB_API_TOKEN).query()
+            
+            ai_message = ai_message['choices'][0]['message']['content']
+        else:
+            ai_message = Chat(system_prompt=sys_propmpt,
+                            message=current_message,
+                            endpoint_url=ENDPOINT_URL_BAD,
+                            api_token=HUGGINGFACEHUB_API_TOKEN).query()
+            
+            ai_message = ai_message['choices'][0]['message']['content']    
+        
+        message_json = {
+            'api_key': api_key,
+            'model_response': {
+                'chat_id': chat_id,
+                'response': ai_message
+            }
+        }
+        time.sleep(60)
         return Response({"received_data": message_json}, status=status.HTTP_200_OK)
