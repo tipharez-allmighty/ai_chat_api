@@ -245,4 +245,5 @@ class ChatAPIViewTest(APIView):
                 'response': ai_message
             }
         }
+        time.sleep(10)
         return Response({"received_data": message_json}, status=status.HTTP_200_OK)
