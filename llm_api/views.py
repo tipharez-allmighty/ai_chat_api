@@ -78,7 +78,7 @@ def system_prompt_view(request):
         
 class ChatAPIView(APIView):
     def post(self, request):
-        
+        chat_data = request.data        
         api_key = chat_data['api_key']
         
         def format_chat_history(chat_history):
@@ -128,6 +128,7 @@ class ChatAPIView(APIView):
 
 class ChatAPIViewTest(APIView):
     def post(self, request):
+        chat_data = request.data
         api_key = chat_data['api_key']
         
         def format_chat_history(chat_history):
